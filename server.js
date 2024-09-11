@@ -3,11 +3,10 @@ const dotenv = require("dotenv");
 const http = require("http");
 const WebSocket = require("ws");
 const app = require("./app");
-const Location = require("./models/locationModel");
-
 dotenv.config({ path: "./config.env" });
 
 const DB = process.env.DATABASE_URL;
+const Location = require("./models/locationModel");
 
 mongoose
   .connect(DB)
