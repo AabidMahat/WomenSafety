@@ -31,11 +31,21 @@ wss.on("connection", (ws) => {
     console.log(`Received location from ${userId}: ${latitude}, ${longitude}`);
 
     // Handle location update logic here
-    const location = await Location.findOneAndUpdate(
-      { userId },
-      { $set: { latitude, longitude, updatedAt: new Date() } },
-      { upsert: true, new: true }
-    );
+
+    if (Location.countDocuments === 0) {
+      Location.create({
+        userId: userId,
+        latitude: latitude,
+        longitude: longitude,
+        updatedAt: Date.now(),
+      });
+    } else {
+      await Location.findOneAndUpdate(
+        { userId },
+        { $set: { latitude, longitude, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+    }
 
     // Broadcast updated location to all clients
     wss.clients.forEach((client) => {
