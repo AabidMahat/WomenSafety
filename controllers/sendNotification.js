@@ -71,9 +71,15 @@ exports.makeCall = async (req, res, next) => {
       },
       function (err, call) {
         if (err) {
-          console.log(err);
+          return res.status(404).json({
+            message: "Error while making call.",
+            errCause: err.message,
+          });
         } else {
-          console.log(call.sid);
+          return res.status(200).json({
+            message: "Call initiated successfully",
+            callSid: call.sid,
+          });
         }
       }
     );
