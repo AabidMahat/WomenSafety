@@ -17,6 +17,11 @@ const serviceAccount = {
   universe_domain: process.env.FIREBASE_UNIVERSAL_DOMAIN,
 };
 
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_TOKEN;
+
+const client = require("twilio")(accountSid, authToken);
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -48,6 +53,30 @@ exports.sendPushNotification = (req, res, next) => {
           errCause: error.message,
         });
       });
+  } catch (error) {
+    return res.status(404).json({
+      message: "Error sending push notification.",
+      errCause: error.message,
+    });
+  }
+};
+
+exports.makeCall = async (req, res, next) => {
+  try {
+    client.calls.create(
+      {
+        url: "http://demo.twilio.com/docs/voice.xml",
+        to: `+91${req.body.phoneNumber}`,
+        from: process.env.TWILIO_NUMBER,
+      },
+      function (err, call) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(call.sid);
+        }
+      }
+    );
   } catch (error) {
     return res.status(404).json({
       message: "Error sending push notification.",
