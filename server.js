@@ -6,7 +6,9 @@ const app = require("./app");
 dotenv.config({ path: "./config.env" });
 
 const DB = process.env.DATABASE_URL;
+const locationController = require("./controllers/locationController");
 const Location = require("./models/locationModel");
+const feedbackController = require("./controllers/feedbackController");
 
 mongoose
   .connect(DB)
@@ -26,25 +28,30 @@ wss.on("connection", (ws) => {
 
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
-    const { userId, latitude, longitude } = data;
 
-    console.log(`Received location from ${userId}: ${latitude}, ${longitude}`);
-
-    // Handle location update logic here
-
-    if (Location.countDocuments === 0) {
-      Location.create({
-        userId: userId,
-        latitude: latitude,
-        longitude: longitude,
-        updatedAt: Date.now(),
-      });
-    } else {
-      await Location.findOneAndUpdate(
-        { userId },
-        { $set: { latitude, longitude, updatedAt: new Date() } },
-        { upsert: true, new: true }
-      );
+    if (data.type === "locationUpdate") {
+      if (Location.countDocuments === 0) {
+        try {
+          const location = await locationController.createLocation(data);
+          ws.send(JSON.stringify({ status: "Success", data: location }));
+        } catch (err) {
+          ws.send(JSON.stringify({ status: "Error", data: err.message }));
+        }
+      } else {
+        try {
+          const location = await locationController.updateLocation(data);
+          ws.send(JSON.stringify({ status: "Success", data: location }));
+        } catch (err) {
+          ws.send(JSON.stringify({ status: "Error", data: err.message }));
+        }
+      }
+    } else if (data.type === "getFeedbacks") {
+      try {
+        const feedback = await feedbackController.getAllFeedback();
+        ws.send(JSON.stringify({ status: "Success", data: feedback }));
+      } catch (err) {
+        ws.send(JSON.stringify({ status: "Error", data: err.message }));
+      }
     }
 
     // Broadcast updated location to all clients

@@ -23,24 +23,11 @@ exports.createFeedback = async (req, res, next) => {
   }
 };
 
-exports.getAllFeedback = async (req, res, next) => {
-  try {
-    const feedbacks = await FeedBack.find();
-    if (!feedbacks) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Error while getting all feedback",
-      });
-    }
-
-    res.status(200).json({
-      success: "Success",
-      data: feedbacks,
-    });
-  } catch (error) {
-    return res.status(404).json({
-      status: "fail",
-      message: error.message,
-    });
+exports.getAllFeedback = async () => {
+  const feedbacks = await FeedBack.find();
+  if (!feedbacks) {
+    throw new Error("No Feedback Found");
   }
+
+  return feedbacks;
 };
