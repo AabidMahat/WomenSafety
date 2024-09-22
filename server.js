@@ -35,17 +35,22 @@ livelocationServer.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
     try {
-      if ((await Location.countDocuments()) === 0) {
-        const location = await locationController.createLocation(data);
-        ws.send(JSON.stringify({ status: "Success", data: location }));
+      if (data["location"]) {
+        if ((await Location.countDocuments()) === 0) {
+          const location = await locationController.createLocation(data);
+          ws.send(JSON.stringify({ status: "Success", data: location }));
+        } else {
+          const location = await locationController.updateLocation(data);
+          ws.send(JSON.stringify({ status: "Success", data: location }));
+        }
       } else {
-        const location = await locationController.updateLocation(data);
+        const location = await locationController.getLocation(data["userId"]);
+        console.log(location);
         ws.send(JSON.stringify({ status: "Success", data: location }));
       }
-
       // Broadcast updated location to all clients
       livelocationServer.clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
+        if (client.readyState === WebSocket.OPEN) {
           client.send(
             JSON.stringify({
               userId: data.userId,

@@ -33,3 +33,12 @@ exports.updateLocation = async (locationData) => {
   }
   return location;
 };
+
+exports.getLocation = async (userId) => {
+  const location = await Location.findOne({ userId });
+
+  if (!location) {
+    throw new Error("Failed to update location");
+  }
+  return location;
+};
