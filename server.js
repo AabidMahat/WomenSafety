@@ -35,18 +35,35 @@ livelocationServer.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
     try {
-      if (data["location"]) {
+      if (data["type"] === "locationUpdate") {
         if ((await Location.countDocuments()) === 0) {
           const location = await locationController.createLocation(data);
-          ws.send(JSON.stringify({ status: "Success", data: location }));
+          ws.send(
+            JSON.stringify({
+              status: "Success",
+              message: "Create Location",
+              data: location,
+            })
+          );
         } else {
           const location = await locationController.updateLocation(data);
-          ws.send(JSON.stringify({ status: "Success", data: location }));
+          ws.send(
+            JSON.stringify({
+              status: "Success",
+              message: "Update Location",
+              data: location,
+            })
+          );
         }
       } else {
         const location = await locationController.getLocation(data["userId"]);
-        console.log(location);
-        ws.send(JSON.stringify({ status: "Success", data: location }));
+        ws.send(
+          JSON.stringify({
+            status: "Success",
+            message: "Get Location",
+            data: location,
+          })
+        );
       }
       // Broadcast updated location to all clients
       livelocationServer.clients.forEach((client) => {
