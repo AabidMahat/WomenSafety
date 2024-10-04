@@ -9,4 +9,6 @@ router
 
 router.route("/makeCall").post(notificationController.makeCall);
 
+router.route("/triggerRecording").post(notificationController.triggerRecording);
+
 module.exports = router;
