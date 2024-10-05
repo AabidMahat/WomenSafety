@@ -98,11 +98,11 @@ exports.triggerRecording = async (req, res, next) => {
     console.log({ deviceToken, duration });
 
     const message = {
-      data: {
-        action: "startRecording",
-        duration: duration.toString(),
+      notification: {
+        title: "Notification Recording",
+        body: "This is for recording audio recording purpose",
       },
-      token: deviceToken,
+      topic: "recording",
     };
 
     admin
