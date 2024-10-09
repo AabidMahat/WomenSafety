@@ -67,7 +67,7 @@ exports.signUp = async (req, res, next) => {
     // Check if the user already exists
     const existingAccount = await User.findOne({ phoneNumber });
 
-    if (existingAccount && !existingAccount.isPhoneVerified) {
+    if (existingAccount) {
       return res.status(400).json({
         status: "error",
         message:
