@@ -127,7 +127,7 @@ exports.verifyOtp = async (req, res, next) => {
     if (user.otp === otp) {
       user.isPhoneVerified = true;
       user.otp = undefined;
-      await user.save();
+      await user.save({ validateBeforeSave: false });
 
       return res.status(200).json({
         status: "success",
