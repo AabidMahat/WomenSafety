@@ -6,3 +6,5 @@ const router = express.Router();
 // Get Live Location
 
 router.route("/getLiveLocation").get(locationController.getUserLiveLocation);
+
+module.exports = router;
