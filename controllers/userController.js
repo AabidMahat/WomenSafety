@@ -176,7 +176,7 @@ exports.logIn = async (req, res, next) => {
 
     user.confirmPassword = undefined;
 
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
       status: "success",
