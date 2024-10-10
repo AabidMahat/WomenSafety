@@ -147,6 +147,52 @@ exports.verifyOtp = async (req, res, next) => {
   }
 };
 
+exports.resendotp = async (req, res, next) => {
+  try {
+    const { phoneNumber } = req.params;
+    const user = await User.findOne({ phoneNumber });
+
+    if (user.isPhoneVerified) {
+      return res.status(500).json({
+        status: "error",
+        message: "User is already verified",
+      });
+    }
+
+    // Generate 6-digit OTP
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      upperCase: false,
+      specialChars: false,
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+    });
+
+    // Send OTP
+    const otpSent = await sendOTp(phoneNumber, otp);
+
+    if (otpSent) {
+      user.otp = otp;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(200).json({
+        status: "success",
+        message: "Otp has been sent. Please verify the account.",
+      });
+    } else {
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to send OTP.",
+      });
+    }
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 exports.logIn = async (req, res, next) => {
   try {
     const { phoneNumber, password } = req.body;
