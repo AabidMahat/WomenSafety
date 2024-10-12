@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const Guardian = require("../models/guardianModel");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
@@ -18,8 +18,8 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
+const createSendToken = (guardian, statusCode, res) => {
+  const token = signToken(guardian._id);
 
   // @ Creating cookies with jwt token
 
@@ -35,10 +35,10 @@ const createSendToken = (user, statusCode, res) => {
 
   res.status(statusCode).json({
     status: statusCode,
-    message: "User logged In",
+    message: "Guardian logged In",
     token,
     data: {
-      user,
+      guardian,
     },
   });
 };
@@ -66,7 +66,7 @@ exports.signUp = async (req, res, next) => {
     const { phoneNumber } = req.body;
 
     // Check if the user already exists
-    const existingAccount = await User.findOne({ phoneNumber });
+    const existingAccount = await Guardian.findOne({ phoneNumber });
 
     if (existingAccount) {
       return res.status(400).json({
@@ -101,7 +101,7 @@ exports.signUp = async (req, res, next) => {
     }
 
     // If no existing user or phone verification needed, create new user
-    const newUser = await User.create(req.body);
+    const newUser = await Guardian.create(req.body);
 
     // Generate JWT token for the new user
     const token = signToken(newUser._id);
@@ -123,7 +123,7 @@ exports.verifyOtp = async (req, res, next) => {
   try {
     const { phoneNumber, otp } = req.body;
 
-    const user = await User.findOne({ phoneNumber });
+    const user = await Guardian.findOne({ phoneNumber });
 
     if (user.otp === otp) {
       user.isPhoneVerified = true;
@@ -151,7 +151,7 @@ exports.verifyOtp = async (req, res, next) => {
 exports.resendotp = async (req, res, next) => {
   try {
     const { phoneNumber } = req.params;
-    const user = await User.findOne({ phoneNumber });
+    const user = await Guardian.findOne({ phoneNumber });
 
     if (user.isPhoneVerified) {
       return res.status(500).json({
@@ -205,12 +205,12 @@ exports.logIn = async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ phoneNumber });
+    const user = await Guardian.findOne({ phoneNumber });
 
     if (!user) {
       return res.status(404).json({
         status: "error",
-        message: "No user found",
+        message: "No guardian found",
       });
     }
 
@@ -227,7 +227,7 @@ exports.logIn = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      message: "User logged In successfully",
+      message: "Guardian logged In successfully",
     });
   } catch (err) {
     return res.status(404).json({
