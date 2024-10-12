@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const { Twilio } = require("twilio");
 
+// @ Authentication
 const accountSID = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
 
