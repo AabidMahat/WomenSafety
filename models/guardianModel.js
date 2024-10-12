@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
+const guardianSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Must enter the name"],
@@ -55,6 +55,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.model("User", userSchema);
+const Guardian = mongoose.model("Guardian", guardianSchema);
 
-module.exports = User;
+module.exports = Guardian;
