@@ -141,6 +141,10 @@ exports.triggerVideoRecording = async (req, res, next) => {
         title: title,
         body: body,
       },
+      data: {
+        duration: duration.toString(),
+        action: "startRecording",
+      },
       topic: "videoRecording",
     };
 
