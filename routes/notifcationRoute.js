@@ -11,4 +11,8 @@ router.route("/makeCall").post(notificationController.makeCall);
 
 router.route("/triggerRecording").post(notificationController.triggerRecording);
 
+router
+  .route("/triggerVideoRecording")
+  .post(notificationController.triggerVideoRecording);
+
 module.exports = router;
