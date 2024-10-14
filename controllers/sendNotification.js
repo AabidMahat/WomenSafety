@@ -103,6 +103,10 @@ exports.triggerRecording = async (req, res, next) => {
         title: "Notification Recording",
         body: "This is for recording audio recording purpose",
       },
+      data: {
+        duration: duration.toString(),
+        action: "audioRecording",
+      },
       topic: "recording",
     };
 
