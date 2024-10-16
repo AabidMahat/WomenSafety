@@ -58,12 +58,21 @@ livelocationServer.on("connection", (ws) => {
             })
           );
         }
-      } else {
+      } else if (data["type"] === "singleLocation") {
         const location = await locationController.getLocation(data["userId"]);
         ws.send(
           JSON.stringify({
             status: "Success",
             message: "Get Location",
+            data: location,
+          })
+        );
+      } else {
+        const location = await locationController.getAllLocation();
+        ws.send(
+          JSON.stringify({
+            status: "Success",
+            message: "Get All Location",
             data: location,
           })
         );

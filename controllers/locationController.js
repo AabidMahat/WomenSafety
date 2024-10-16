@@ -42,3 +42,12 @@ exports.getLocation = async (userId) => {
   }
   return location;
 };
+
+exports.getAllLocation = async () => {
+  const location = await Location.find().sort({ updatedAt: -1 });
+
+  if (!location) {
+    throw new Error("Failed to get locations");
+  }
+  return location;
+};
