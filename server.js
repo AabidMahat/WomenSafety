@@ -36,7 +36,10 @@ livelocationServer.on("connection", (ws) => {
     const data = JSON.parse(message);
     try {
       if (data["type"] === "locationUpdate") {
-        if (await Location.findById(data["userId"])) {
+        const existingLocation = await Location.findOne({
+          userId: data["userId"],
+        });
+        if (!existingLocation) {
           const location = await locationController.createLocation(data);
           ws.send(
             JSON.stringify({

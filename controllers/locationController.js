@@ -22,7 +22,7 @@ exports.createLocation = async (locationData) => {
 exports.updateLocation = async (locationData) => {
   const { userId, latitude, longitude } = locationData;
 
-  const location = await Location.findByIdAndUpdate(
+  const location = await Location.findOneAndUpdate(
     { userId },
     { $set: { latitude, longitude, updatedAt: new Date() } },
     { upsert: true, new: true }
