@@ -36,7 +36,7 @@ livelocationServer.on("connection", (ws) => {
     const data = JSON.parse(message);
     try {
       if (data["type"] === "locationUpdate") {
-        if ((await Location.findById(data["userId"])) == null) {
+        if (await Location.findById(data["userId"])) {
           const location = await locationController.createLocation(data);
           ws.send(
             JSON.stringify({
