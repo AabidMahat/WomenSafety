@@ -237,3 +237,28 @@ exports.logIn = async (req, res, next) => {
     });
   }
 };
+
+exports.getGuardian = async (req, res, next) => {
+  try {
+    const guardian = await Guardian.findById({
+      _id: req.params.id,
+    });
+
+    if (!guardian) {
+      return res.status(500).json({
+        status: "error",
+        message: "No Guardian Found",
+      });
+    }
+
+    res.status(200).json({
+      status: 200,
+      data: guardian,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
