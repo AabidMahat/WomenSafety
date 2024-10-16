@@ -39,7 +39,10 @@ const userSchema = new mongoose.Schema({
     },
   },
 
-  message_template: String,
+  message_template: {
+    type: String,
+    default: "I'm in trouble and need help! Here is my current location: ...",
+  },
 
   guardian: [
     {

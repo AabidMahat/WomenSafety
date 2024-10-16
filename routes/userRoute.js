@@ -11,4 +11,6 @@ router.route("/resendOtp/:phoneNumber").get(userController.resendotp);
 
 router.route("/logIn").post(userController.logIn);
 
+router.route("getAllUsers").post(userController.getAllUser);
+
 module.exports = router;

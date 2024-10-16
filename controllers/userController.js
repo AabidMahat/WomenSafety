@@ -236,3 +236,25 @@ exports.logIn = async (req, res, next) => {
     });
   }
 };
+
+exports.getAllUser = async (req, res, next) => {
+  try {
+    const users = await User.find();
+
+    if (!users) {
+      return res.status(500).json({
+        status: "error",
+        message: "No User found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: users,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
