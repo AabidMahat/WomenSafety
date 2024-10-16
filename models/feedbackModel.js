@@ -38,7 +38,7 @@ const feedbackSchema = new mongoose.Schema({
 
   guardianId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: Guardian,
+    ref: "Guardian",
   },
 });
 
