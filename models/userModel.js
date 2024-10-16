@@ -39,6 +39,21 @@ const userSchema = new mongoose.Schema({
     },
   },
 
+  message_template: String,
+
+  guardian: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Guardian",
+    },
+  ],
+  feedback: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feedback",
+    },
+  ],
+
   isPhoneVerified: {
     type: Boolean,
     default: false,
