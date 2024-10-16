@@ -31,8 +31,12 @@ const feedbackSchema = new mongoose.Schema({
     default: () => Date.now(),
   },
   userId: {
-    type: String,
-    default: "Aabid1234",
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User,
+  },
+  guardianId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Guardian,
   },
 });
 
