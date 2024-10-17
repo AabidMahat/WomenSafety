@@ -28,7 +28,10 @@ exports.createFeedback = async (req, res, next) => {
 
 exports.getAllFeedback = async (req, res) => {
   try {
-    const feedbacks = await FeedBack.find();
+    const feedbacks = await FeedBack.find()
+      .populate("userId", "name role")
+      .populate("guardianId", "name role")
+      .exec();
 
     if (!feedbacks || feedbacks.length === 0) {
       return res.status(404).json({
