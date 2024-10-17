@@ -11,6 +11,6 @@ router.route("/resendOtp/:phoneNumber").get(guardianController.resendotp);
 
 router.route("/logIn").post(guardianController.logIn);
 
-router.route("/getGuardian/:id").get(guardianController.getGuardian);
+router.route("/getGuardians").post(guardianController.getGuardian);
 
 module.exports = router;

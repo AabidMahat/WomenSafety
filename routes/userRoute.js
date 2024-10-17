@@ -13,6 +13,6 @@ router.route("/logIn").post(userController.logIn);
 
 router.route("/getAllUsers").post(userController.getAllUser);
 
-router.route("/getUser/:userId").get(userController.getUser);
+router.route("/getUsers").post(userController.getUser);
 
 module.exports = router;

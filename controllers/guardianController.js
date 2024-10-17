@@ -240,11 +240,13 @@ exports.logIn = async (req, res, next) => {
 
 exports.getGuardian = async (req, res, next) => {
   try {
-    const guardian = await Guardian.findById({
-      _id: req.params.id,
+    const guardians = await Guardian.find({
+      _id: {
+        $in: req.body.guardianId,
+      },
     });
 
-    if (!guardian) {
+    if (!guardians) {
       return res.status(500).json({
         status: "error",
         message: "No Guardian Found",
@@ -253,7 +255,7 @@ exports.getGuardian = async (req, res, next) => {
 
     res.status(200).json({
       status: 200,
-      data: guardian,
+      data: guardians,
     });
   } catch (err) {
     return res.status(404).json({
