@@ -53,7 +53,10 @@ exports.getAllFeedback = async (req, res) => {
 };
 
 exports.getAllFeedbackForWebSocket = async () => {
-  const feedbacks = await FeedBack.find();
+  const feedbacks = await FeedBack.find()
+    .populate("userId", "name role")
+    .populate("guardianId", "name role")
+    .exec();
 
   if (!feedbacks) {
     throw new Error("Not able to fetch feedbacks");
