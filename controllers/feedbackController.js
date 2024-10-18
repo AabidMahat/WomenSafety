@@ -12,6 +12,11 @@ exports.createFeedback = async (req, res, next) => {
       });
     }
 
+    // const populatedFeedback = await FeedBack.findById(feedback._id)
+    //   .populate("userId", "name role")
+    //   .populate("guardianId", "name role")
+    //   .exec();
+
     notifyClientsNewFeedback(feedback);
 
     res.status(200).json({

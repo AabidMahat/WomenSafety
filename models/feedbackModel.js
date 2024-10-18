@@ -42,6 +42,13 @@ const feedbackSchema = new mongoose.Schema({
   },
 });
 
+feedbackSchema.post("save", async function (doc, next) {
+  await doc.populate("userId", "name role");
+  await doc.populate("guardianId", "name role");
+
+  next();
+});
+
 const Feedback = mongoose.model("FeedBack", feedbackSchema);
 
 module.exports = Feedback;
