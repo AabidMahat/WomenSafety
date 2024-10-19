@@ -271,3 +271,31 @@ exports.getGuardian = async (req, res, next) => {
     });
   }
 };
+
+// Get a particular guardian
+
+exports.fetchGuardian = async (req, res, next) => {
+  try {
+    const guardian = await Guardian.findById(req.params.id).populate(
+      "userId",
+      "name phoneNumber"
+    );
+
+    if (!guardian) {
+      return res.status(404).json({
+        status: "error",
+        message: "Guardian not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      data: guardian,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};

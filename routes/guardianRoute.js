@@ -13,4 +13,6 @@ router.route("/logIn").post(guardianController.logIn);
 
 router.route("/getGuardians").post(guardianController.getGuardian);
 
+router.route("/fetchGuardian/:id").get(guardianController.fetchGuardian);
+
 module.exports = router;
