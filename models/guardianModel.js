@@ -51,8 +51,15 @@ const guardianSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ["gurdian", "user"],
+    enum: ["guardian", "user"],
   },
+
+  userId: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 const Guardian = mongoose.model("Guardian", guardianSchema);

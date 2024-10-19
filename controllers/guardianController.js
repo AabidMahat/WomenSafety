@@ -64,7 +64,9 @@ const sendOTp = async (phoneNumber, otp) => {
 exports.signUp = async (req, res, next) => {
   try {
     const { phoneNumber } = req.body;
-
+    console.log(process.env.TWILIO_SID);
+    console.log(process.env.TWILIO_TOKEN);
+    console.log(process.env.TWILIO_NUMBER);
     // Check if the user already exists
     const existingAccount = await Guardian.findOne({ phoneNumber });
 
@@ -88,18 +90,6 @@ exports.signUp = async (req, res, next) => {
     // Send OTP
     const otpSent = await sendOTp(phoneNumber, otp);
 
-    if (otpSent) {
-      res.status(200).json({
-        status: "success",
-        message: "Otp has been sent. Please verify the account.",
-      });
-    } else {
-      return res.status(500).json({
-        status: "error",
-        message: "Failed to send OTP.",
-      });
-    }
-
     // If no existing user or phone verification needed, create new user
     const newUser = await Guardian.create(req.body);
 
@@ -111,6 +101,18 @@ exports.signUp = async (req, res, next) => {
     newUser.otp = otp;
 
     await newUser.save();
+
+    if (otpSent) {
+      return res.status(200).json({
+        status: "success",
+        message: "Otp has been sent. Please verify the account.",
+      });
+    } else {
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to send OTP.",
+      });
+    }
   } catch (err) {
     return res.status(404).json({
       status: "error",
@@ -124,6 +126,11 @@ exports.verifyOtp = async (req, res, next) => {
     const { phoneNumber, otp } = req.body;
 
     const user = await Guardian.findOne({ phoneNumber });
+
+    console.log({
+      userOtp: user.otp,
+      otp: otp,
+    });
 
     if (user.otp === otp) {
       user.isPhoneVerified = true;
