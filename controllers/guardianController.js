@@ -299,3 +299,49 @@ exports.fetchGuardian = async (req, res, next) => {
     });
   }
 };
+
+exports.updateGuardian = async (req, res, next) => {
+  try {
+    let updateOps = { ...req.body };
+
+    if (req.body.addUserId) {
+      updateOps = {
+        ...updateOps,
+        $addToSet: { userId: req.body.addUserId },
+      };
+    }
+
+    if (req.body.removeUserId) {
+      updateOps = {
+        ...updateOps,
+        $pull: { userId: req.body.removeUserId },
+      };
+    }
+    const updatedGuardian = await Guardian.findByIdAndUpdate(
+      req.params.id,
+      updateOps,
+      {
+        new: true,
+        runValidators: false,
+      }
+    );
+    if (!updatedGuardian) {
+      return res.status(404).json({
+        status: "error",
+        message: "Guardian not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        guardian: updatedGuardian,
+      },
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};

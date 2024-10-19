@@ -3,6 +3,10 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
 const guardianSchema = new mongoose.Schema({
+  avatar: {
+    type: String,
+    default: "default.png",
+  },
   name: {
     type: String,
     required: [true, "Must enter the name"],
@@ -14,6 +18,10 @@ const guardianSchema = new mongoose.Schema({
       validator: (value) => validator.isEmail(value),
       message: "Please enter a valid email",
     },
+  },
+  address: {
+    type: String,
+    default: "123 Example Street",
   },
   phoneNumber: {
     type: String,

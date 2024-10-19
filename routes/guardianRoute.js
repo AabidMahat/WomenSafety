@@ -15,4 +15,6 @@ router.route("/getGuardians").post(guardianController.getGuardian);
 
 router.route("/fetchGuardian/:id").get(guardianController.fetchGuardian);
 
+router.route("/updateGuardian/:id").patch(guardianController.updateGuardian);
+
 module.exports = router;
