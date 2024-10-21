@@ -314,7 +314,7 @@ exports.updateGuardian = async (req, res, next) => {
     if (req.body.removeUserId) {
       updateOps = {
         ...updateOps,
-        $pull: { userId: req.body.removeUserId },
+        $pull: { userId: { $in: req.body.removeUserId } },
       };
     }
     const updatedGuardian = await Guardian.findByIdAndUpdate(
