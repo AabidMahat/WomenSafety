@@ -6,12 +6,12 @@ exports.addFCMToken = async (req, res, next) => {
 
     if (!newToken) {
       return res.status(404).json({
-        success: "error",
+        status: "error",
         message: "Failed to add token",
       });
     }
-    res.status(201).json({
-      success: true,
+    res.status(200).json({
+      status: "success",
       message: "Token added successfully",
       data: newToken,
     });
