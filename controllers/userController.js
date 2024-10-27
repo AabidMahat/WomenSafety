@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
@@ -67,7 +68,7 @@ exports.signUp = async (req, res, next) => {
     // Check if the user already exists
     const existingAccount = await User.findOne({ phoneNumber });
 
-    if (existingAccount) {
+    if (existingAccount && !existingAccount.isPhoneVerified) {
       return res.status(400).json({
         status: "error",
         message:
@@ -87,12 +88,8 @@ exports.signUp = async (req, res, next) => {
     // Send OTP
     const otpSent = await sendOTp(phoneNumber, otp);
 
-    if (otpSent) {
-      res.status(200).json({
-        status: "success",
-        message: "Otp has been sent. Please verify the account.",
-      });
-    } else {
+    if (!otpSent) {
+      // If OTP failed to send, respond and stop further processing
       return res.status(500).json({
         status: "error",
         message: "Failed to send OTP.",
@@ -109,7 +106,13 @@ exports.signUp = async (req, res, next) => {
     newUser.verificationToken = token;
     newUser.otp = otp;
 
-    await newUser.save();
+    await newUser.save({ validateBeforeSave: false });
+
+    // If everything is successful, send a success response
+    res.status(200).json({
+      status: "success",
+      message: "Otp has been sent. Please verify the account.",
+    });
   } catch (err) {
     return res.status(404).json({
       status: "error",
@@ -237,22 +240,53 @@ exports.logIn = async (req, res, next) => {
   }
 };
 
-exports.getAllUser = async (req, res, next) => {
+exports.createNewUser = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const newUser = new User(req.body); // Create a new instance of User
 
-    if (!users) {
-      return res.status(500).json({
+    if (!newUser) {
+      return res.status(404).json({
         status: "error",
-        message: "No User found",
+        message: "User not created",
       });
     }
+
+    await newUser.save(); // Save the newUser to the database
+
+    res.status(201).json({
+      status: "success",
+      data: newUser,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const users = await User.find({
+      user_id: userId,
+    });
+
+    if (!users) {
+      res.status(404).json({
+        status: "error",
+        message: "No user to this account",
+      });
+    }
+
     res.status(200).json({
       status: "success",
+      message: "User founded",
+      length: users.length,
       data: users,
     });
   } catch (err) {
-    return res.status(404).json({
+    res.status(500).json({
       status: "error",
       message: err.message,
     });
@@ -261,27 +295,161 @@ exports.getAllUser = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
   try {
-    const users = await User.find({
-      _id: {
-        $in: req.body.userId,
-      },
-    });
-
-    if (!users) {
-      return res.status(500).json({
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({
         status: "error",
-        message: "No users found",
+        message: "User not found",
       });
     }
 
     res.status(200).json({
       status: "success",
-      data: users,
+      data: user,
     });
   } catch (err) {
-    return res.status(404).json({
+    res.status(500).json({
       status: "error",
-      messgae: err.message,
+      message: err.message,
+    });
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const updateUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    if (!updateUser) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Transaction not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Updated the transaction",
+      data: updateUser,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const deleteData = await User.findByIdAndDelete(userId);
+    if (!deleteData) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+exports.updateGuardian = async (req, res, next) => {
+  try {
+    const { name, phoneNumber, email, guardian } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      {
+        name: name,
+        email: email,
+        phoneNumber: phoneNumber,
+        $addToSet: { guardian: { $each: guardian } },
+      },
+      { new: true }
+    );
+
+    console.log(guardian);
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+exports.deleteGuardian = async (req, res, next) => {
+  try {
+    const { userId } = req.params; // Extract userId from the URL
+    const { guardianId } = req.body; // Extract guardianId from the request body
+
+    // Validate input
+    if (!userId || !guardianId) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID and Guardian ID are required",
+      });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Check if the guardian exists in the user's guardian list
+    const guardianExists = user.guardian.some(
+      (guardian) => guardian._id.toString() === guardianId
+    );
+    if (!guardianExists) {
+      return res.status(404).json({
+        status: "error",
+        message: "Guardian not found",
+      });
+    }
+
+    // Remove the guardian from the user's guardian array
+    user.guardian = user.guardian.filter(
+      (guardian) => guardian._id.toString() !== guardianId
+    );
+
+    // Save the updated user document
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Guardian deleted successfully",
+      data: user, // Optionally return updated user data
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: "Server error: " + err.message,
     });
   }
 };

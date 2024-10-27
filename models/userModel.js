@@ -1,75 +1,70 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
+
+const guardianSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    default_password: {
+      type: String,
+      default: "women@123",
+    },
+  },
+  { _id: false }
+);
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Must enter the name"],
-  },
-  email: {
-    type: String,
-    required: [true, "Must enter the email"],
-    validate: {
-      validator: (value) => validator.isEmail(value),
-      message: "Please enter a valid email",
-    },
+    required: true,
   },
   phoneNumber: {
     type: String,
-    required: [true, "Must enter the phone number"],
-    validate: {
-      validator: (value) => validator.isMobilePhone(value),
-      message: "Please enter valid email",
-    },
+    required: true,
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
   },
   password: {
     type: String,
-    required: [true, "Enter the passowrd"],
-    minLength: [8, "Password must be at least 8 characters"],
+    required: true,
   },
   confirmPassword: {
     type: String,
-    required: [true, "Confirm the password"],
+    required: true,
     validate: {
       validator: function (value) {
-        return this.password === value;
+        return value === this.password;
       },
-      message: "Password are not same",
+      message: "Passwords do not match",
     },
   },
-
   message_template: {
     type: String,
-    default: "I'm in trouble and need help! Here is my current location: ...",
   },
-
-  guardian: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Guardian",
-    },
-  ],
-  feedback: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feedback",
-    },
-  ],
-
+  guardian: [guardianSchema],
   isPhoneVerified: {
     type: Boolean,
     default: false,
   },
-
   verificationToken: String,
-
   otp: Number,
-
   role: {
     type: String,
     required: true,
-    enum: ["gurdian", "user"],
+    enum: ["guardian", "user"],
+  },
+  feedback: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Feedback",
   },
 });
 
