@@ -1,24 +1,25 @@
 const Token = require("../models/tokenModel");
 
-exports.addFCMToken = async (req, res, next) => {
+exports.addOrUpdateFCMToken = async (req, res, next) => {
   try {
-    const newToken = await Token.create(req.body);
+    const { userId, fcm_token } = req.body;
 
-    if (!newToken) {
-      return res.status(404).json({
-        status: "error",
-        message: "Failed to add token",
-      });
-    }
+    const updatedToken = await Token.updateOne(
+      { userId: userId }, // Query to match document by userId
+      { $set: { fcm_token: fcm_token } }, // Fields to update
+      { upsert: true } // Upsert option: insert if not found
+    );
+
     res.status(200).json({
       status: "success",
-      message: "Token added successfully",
-      data: newToken,
+      message: "Token added or updated successfully",
+      data: updatedToken,
     });
   } catch (err) {
-    return res.status(404).json({
+    return res.status(500).json({
       status: "error",
-      message: err.message,
+      message: "Error adding or updating token",
+      error: err.message,
     });
   }
 };
