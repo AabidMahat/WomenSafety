@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Feedback",
   },
-  videoUrl: [String̥],
+  videoUrl: [String],
   audioUrl: [String],
 });
 
