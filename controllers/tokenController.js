@@ -23,3 +23,31 @@ exports.addOrUpdateFCMToken = async (req, res, next) => {
     });
   }
 };
+
+exports.getAllToken = async (req, res, next) => {
+  try {
+    const tokens = await Token.find({
+      userId: {
+        $in: req.body.userId,
+      },
+    }).select("-__v");
+
+    if (!tokens) {
+      return res.status(404).json({
+        status: "error",
+        message: "No tokens found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: tokens,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: "Error fetching tokens",
+      error: err.message,
+    });
+  }
+};
