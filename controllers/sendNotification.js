@@ -39,7 +39,7 @@ exports.sendPushNotification = (req, res, next) => {
 
     admin
       .messaging()
-      .send(message)
+      .sendMulticast(message)
       .then((response) => {
         console.log("Successfully sent message:", response);
         return res.status(200).send({
