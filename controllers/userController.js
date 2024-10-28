@@ -459,13 +459,20 @@ exports.addAudioAndVideo = async (req, res, next) => {
     const userId = req.params.userId;
     const { audioUrl, videoUrl } = req.body;
 
+    const updateField = {};
+
+    if (audioUrl) {
+      updateField.audioUrl = audioUrl;
+    }
+
+    if (videoUrl) {
+      updateField.videoUrl = videoUrl;
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
       {
-        $push: {
-          audioUrl: audioUrl,
-          videoUrl: videoUrl,
-        },
+        $push: updateField,
       },
       {
         new: true,
