@@ -27,19 +27,20 @@ admin.initializeApp({
 });
 
 exports.sendPushNotification = (req, res, next) => {
-  const { title, body } = req.body;
+  const { title, body, fcm_tokens } = req.body;
+
   try {
     const message = {
       notification: {
         title: title,
         body: body,
       },
-      token: req.body.fcm_token,
+      tokens: fcm_tokens, // Use 'tokens' to send to multiple recipients
     };
 
     admin
       .messaging()
-      .sendMulticast(message)
+      .sendMulticast(message) // sendMulticast expects 'tokens' field
       .then((response) => {
         console.log("Successfully sent message:", response);
         return res.status(200).send({
