@@ -453,3 +453,40 @@ exports.deleteGuardian = async (req, res, next) => {
     });
   }
 };
+
+exports.addAudioAndVideo = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const { audioUrl, videoUrl } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          audioUrl: audioUrl,
+          videoUrl: videoUrl,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Audio and video added successfully",
+      data: user,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: "Server error: " + err.message,
+    });
+  }
+};

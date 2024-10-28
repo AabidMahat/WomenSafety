@@ -19,4 +19,8 @@ router.route("/resendOtp/:phoneNumber").get(userController.resendotp);
 
 router.route("/logIn").post(userController.logIn);
 router.route("/addGuardian/:userId").patch(userController.updateGuardian);
+
+router
+  .route("/addAudioAndVideo/:userId")
+  .patch(userController.addAudioAndVideo);
 module.exports = router;
