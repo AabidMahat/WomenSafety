@@ -454,6 +454,34 @@ exports.deleteGuardian = async (req, res, next) => {
   }
 };
 
+exports.getGuardiansWithNumber = async (req, res, next) => {
+  try {
+    const user = await User.find({
+      guardian: {
+        $elemMatch: {
+          phoneNumber: req.body.phoneNumber,
+        },
+      },
+    }).select("name _id phoneNumber");
+
+    if (!user || user.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 exports.addAudioAndVideo = async (req, res, next) => {
   try {
     const userId = req.params.userId;

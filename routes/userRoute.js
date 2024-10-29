@@ -23,4 +23,8 @@ router.route("/addGuardian/:userId").patch(userController.updateGuardian);
 router
   .route("/addAudioAndVideo/:userId")
   .patch(userController.addAudioAndVideo);
+
+router
+  .route("/gurdianWithPhoneNUmber")
+  .post(userController.getGuardiansWithNumber);
 module.exports = router;
