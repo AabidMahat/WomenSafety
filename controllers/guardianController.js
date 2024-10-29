@@ -300,6 +300,37 @@ exports.fetchGuardian = async (req, res, next) => {
   }
 };
 
+exports.updateUserList = async (req, res, next) => {
+  try {
+    const guardian = await Guardian.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: {
+          userId: { $each: req.body.userId },
+        },
+      },
+      { new: true }
+    );
+
+    if (!guardian) {
+      return res.status(404).json({
+        status: "error",
+        message: "Error while updating guardian",
+      });
+    }
+
+    res.status(200).json({
+      status: 200,
+      data: guardian,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 exports.updateGuardian = async (req, res, next) => {
   try {
     let updateOps = { ...req.body };
