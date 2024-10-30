@@ -2,25 +2,21 @@ const Request = require("../models/requestModel");
 
 exports.addRequest = async (req, res, next) => {
   try {
-    const { guardian, userId } = req.body;
+    const { guardianData, userId } = req.body;
 
-    // Create a new request document
-    const newRequest = await Request.create({
-      userId: userId,
-      guardians: guardian,
-    });
+    const bulkOperation = guardianData.map((guardian) => ({
+      create: {
+        userId: userId,
+        guardians: guardian,
+      },
+    }));
 
-    if (!newRequest) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
-    }
+    const result = await Request.bulkWrite(bulkOperation);
 
     res.status(200).json({
       status: "success",
       message: "Request created successfully",
-      data: newRequest,
+      data: result,
     });
   } catch (err) {
     res.status(500).json({
