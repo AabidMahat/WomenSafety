@@ -5,9 +5,11 @@ exports.addRequest = async (req, res, next) => {
     const { guardianData, userId } = req.body;
 
     const bulkOperation = guardianData.map((guardian) => ({
-      create: {
-        userId: userId,
-        guardians: guardian,
+      insertOne: {
+        document: {
+          userId: userId,
+          guardian: guardian,
+        },
       },
     }));
 
