@@ -5,6 +5,7 @@ const feedbackRoute = require("./routes/feedbackRoute");
 const userRoute = require("./routes/userRoute");
 const guardianRoute = require("./routes/guardianRoute");
 const tokenRoute = require("./routes/tokenRoute");
+const requestRoute = require("./routes/requestRouter");
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.use("/api/v3/feedback", feedbackRoute);
 app.use("/api/v3/user", userRoute);
 app.use("/api/v3/guardian", guardianRoute);
 app.use("/api/v3/token", tokenRoute);
+app.use("/api/v3/request", requestRoute);
 
 module.exports = app;
