@@ -8,7 +8,7 @@ exports.addRequest = async (req, res, next) => {
       insertOne: {
         document: {
           userId: userId,
-          guardian: guardian,
+          guardians: guardian,
         },
       },
     }));
