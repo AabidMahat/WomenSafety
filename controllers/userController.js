@@ -371,7 +371,6 @@ exports.updateGuardian = async (req, res, next) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.userId,
       {
-        
         $addToSet: { guardian: { $each: guardian } },
       },
       { new: true }
@@ -488,11 +487,19 @@ exports.addAudioAndVideo = async (req, res, next) => {
     const updateField = {};
 
     if (audioUrl) {
-      updateField.audioUrl = audioUrl;
+      updateField.audioUrl = {
+        $each: [audioUrl],
+        $slice: -3,
+        $position: 0,
+      };
     }
 
     if (videoUrl) {
-      updateField.videoUrl = videoUrl;
+      updateField.videoUrl = {
+        $each: [videoUrl],
+        $slice: -3,
+        $position: 0,
+      };
     }
 
     const user = await User.findByIdAndUpdate(
