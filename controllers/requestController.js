@@ -83,3 +83,30 @@ exports.updateStatus = async (req, res, next) => {
     });
   }
 };
+
+exports.getRequestByUserId = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const request = await Request.find({
+      userId,
+    }).select("status guardians");
+
+    if (!request) {
+      return res.status(404).json({
+        status: "error",
+        message: "Request not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: request,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};

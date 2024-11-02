@@ -11,4 +11,6 @@ router
 
 router.route("/updateStatus").patch(requestController.updateStatus);
 
+router.route("/getUserbyId/:userId").get(requestController.getRequestByUserId);
+
 module.exports = router;
