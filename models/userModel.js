@@ -20,6 +20,11 @@ const guardianSchema = new mongoose.Schema(
 );
 
 const userSchema = new mongoose.Schema({
+  avatar: {
+    type: String,
+    default: "default.png",
+  },
+
   name: {
     type: String,
     required: true,
