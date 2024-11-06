@@ -78,9 +78,9 @@ exports.checkFeedbackPresent = async (req, res, next) => {
         $near: {
           $geometry: {
             type: "Point",
-            coordinates: [latitude, longitude],
+            coordinates: [longitude, latitude], // Order: [longitude, latitude]
           },
-          $maxDistance: 500,
+          $maxDistance: 500, // Distance in meters
         },
       },
       userId: userId,
