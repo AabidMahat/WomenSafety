@@ -1,3 +1,4 @@
+const Feedback = require("../models/feedbackModel");
 const FeedBack = require("../models/feedbackModel");
 const { notifyClientsNewFeedback } = require("../webSocket/feedback_websocket");
 
@@ -67,4 +68,36 @@ exports.getAllFeedbackForWebSocket = async () => {
     throw new Error("Not able to fetch feedbacks");
   }
   return feedbacks;
+};
+
+exports.checkFeedbackPresent = async (req, res, next) => {
+  const { latitude, longitude, userId } = req.body;
+  try {
+    const feedback = await FeedBack.findOne({
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [latitude, longitude],
+          },
+          $maxDistance: 500,
+        },
+      },
+      userId: userId,
+    });
+
+    if (feedback) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Feedback already exists for this location by the same user.",
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(404).json({
+      status: "error",
+      messgae: err.message,
+    });
+  }
 };

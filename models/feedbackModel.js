@@ -2,17 +2,14 @@ const mongoose = require("mongoose");
 
 const feedbackSchema = new mongoose.Schema({
   location: {
-    latitude: {
-      type: Number,
-      required: true,
-      min: -90,
-      max: 90,
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
     },
-    longitude: {
-      type: Number,
+    coordinates: {
+      type: [Number],
       required: true,
-      min: -180,
-      max: 180,
     },
   },
 
