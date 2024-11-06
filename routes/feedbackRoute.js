@@ -6,4 +6,8 @@ const router = express.Router();
 router.route("/sendFeedback").post(feedbackController.createFeedback);
 router.route("/getAllFeedback").get(feedbackController.getAllFeedback);
 
+router
+  .route("/checkFeedbackPresent")
+  .post(feedbackController.checkFeedbackPresent);
+
 module.exports = router;
