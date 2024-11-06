@@ -75,7 +75,7 @@ exports.checkFeedbackPresent = async (req, res, next) => {
   try {
     const feedback = await FeedBack.findOne({
       location: {
-        $nearSphere: {
+        $near: {
           $geometry: {
             type: "Point",
             coordinates: [longitude, latitude], // Order: [longitude, latitude]
