@@ -71,21 +71,14 @@ exports.getAllFeedbackForWebSocket = async () => {
 };
 
 exports.checkFeedbackPresent = async (req, res, next) => {
-  const { latitude, longitude, userId } = req.body;
+  const { location, userId } = req.body;
   try {
-    console.log({ latitude, longitude, userId });
+    console.log({ location, userId });
 
-    const feedback = await FeedBack.findOne({
-      location: {
-        $near: {
-          $geometry: {
-            type: "Point",
-            coordinates: [longitude, latitude], // Order: [longitude, latitude]
-          },
-          $maxDistance: 500, // Distance in meters
-        },
-      },
+    const feedback = await Feedback.findOne({
       userId: userId,
+      "location.latitude": location.latitude,
+      "location.longitude": location.longitude,
     });
 
     if (feedback) {
