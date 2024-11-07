@@ -85,12 +85,12 @@ exports.checkFeedbackPresent = async (req, res, next) => {
       return res.status(400).json({
         status: "fail",
         message: "Feedback already exists for this location by the same user.",
+        data: feedback,
       });
     }
 
     return res.status(200).json({
       status: "success",
-      data: feedback,
     });
   } catch (err) {
     return res.status(404).json({
