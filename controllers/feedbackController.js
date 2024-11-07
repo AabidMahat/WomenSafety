@@ -79,7 +79,10 @@ exports.checkFeedbackPresent = async (req, res, next) => {
       userId: userId,
       "location.latitude": location.latitude,
       "location.longitude": location.longitude,
-    });
+    })
+      .populate("userId", "name role avatar")
+      .populate("guardianId", "name role avatar")
+      .exec();
 
     if (feedback) {
       return res.status(400).json({
