@@ -35,8 +35,8 @@ exports.createFeedback = async (req, res, next) => {
 exports.getAllFeedback = async (req, res) => {
   try {
     const feedbacks = await FeedBack.find()
-      .populate("userId", "name role")
-      .populate("guardianId", "name role")
+      .populate("userId", "name role avatar")
+      .populate("guardianId", "name role avatar")
       .exec();
 
     if (!feedbacks || feedbacks.length === 0) {
@@ -60,8 +60,8 @@ exports.getAllFeedback = async (req, res) => {
 
 exports.getAllFeedbackForWebSocket = async () => {
   const feedbacks = await FeedBack.find()
-    .populate("userId", "name role")
-    .populate("guardianId", "name role")
+    .populate("userId", "name role avatar")
+    .populate("guardianId", "name role avatar")
     .exec();
 
   if (!feedbacks) {
@@ -73,6 +73,8 @@ exports.getAllFeedbackForWebSocket = async () => {
 exports.checkFeedbackPresent = async (req, res, next) => {
   const { latitude, longitude, userId } = req.body;
   try {
+    console.log({ latitude, longitude, userId });
+
     const feedback = await FeedBack.findOne({
       location: {
         $near: {
@@ -93,7 +95,9 @@ exports.checkFeedbackPresent = async (req, res, next) => {
       });
     }
 
-    next();
+    return res.status(200).json({
+      status: "success",
+    });
   } catch (err) {
     return res.status(404).json({
       status: "error",
