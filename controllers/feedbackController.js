@@ -34,10 +34,11 @@ exports.createFeedback = async (req, res, next) => {
 
 exports.updateFeedback = async (req, res, next) => {
   try {
-    const { comment, category, userId } = req.body;
+    const { comment, category } = req.body;
 
-    const feedback = await FeedBack.findOne({
-      userId: userId,
+    const feedback = await FeedBack.findByIdAndUpdate(req.params.id, {
+      comment,
+      category,
     });
 
     if (!feedback) {
@@ -46,11 +47,6 @@ exports.updateFeedback = async (req, res, next) => {
         message: "Feedback not found",
       });
     }
-
-    feedback.comment = comment;
-    feedback.category = category;
-
-    await feedback.save({ validateBeforeSave: false });
 
     notifyClientsNewFeedback(feedback);
 
