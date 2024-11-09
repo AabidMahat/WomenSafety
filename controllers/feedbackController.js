@@ -32,6 +32,40 @@ exports.createFeedback = async (req, res, next) => {
   }
 };
 
+exports.updateFeedback = async (req, res, next) => {
+  try {
+    const { comment, category, userId } = req.body;
+
+    const feedback = await FeedBack.findOne({
+      userId: userId,
+    });
+
+    if (!feedback) {
+      return res.status(404).json({
+        success: "Failed",
+        message: "Feedback not found",
+      });
+    }
+
+    feedback.comment = comment;
+    feedback.category = category;
+
+    await feedback.save({ validateBeforeSave: false });
+
+    notifyClientsNewFeedback(feedback);
+
+    return res.status(200).json({
+      success: "Success",
+      data: feedback,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 exports.getAllFeedback = async (req, res) => {
   try {
     const feedbacks = await FeedBack.find()
