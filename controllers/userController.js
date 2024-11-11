@@ -295,7 +295,11 @@ exports.getAllUsers = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.userId).populate({
+      path: "guardian",
+      select: "name phoneNumber avatar",
+    });
+
     if (!user) {
       return res.status(404).json({
         status: "error",
@@ -399,8 +403,8 @@ exports.updateGuardian = async (req, res, next) => {
 
 exports.deleteGuardian = async (req, res, next) => {
   try {
-    const { userId } = req.params; // Extract userId from the URL
-    const { guardianId } = req.body; // Extract guardianId from the request body
+    const { userId } = req.params;
+    const { guardianId } = req.body;
 
     // Validate input
     if (!userId || !guardianId) {
