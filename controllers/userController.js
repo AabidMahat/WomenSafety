@@ -295,11 +295,7 @@ exports.getAllUsers = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.userId).populate({
-      path: "guardian",
-      select: "name phoneNumber avatar",
-    });
-
+    const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(404).json({
         status: "error",
