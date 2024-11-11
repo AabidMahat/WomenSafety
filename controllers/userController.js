@@ -367,27 +367,22 @@ exports.deleteUser = async (req, res, next) => {
 };
 exports.updateGuardian = async (req, res, next) => {
   try {
-    const { guardian } = req.body;
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.userId,
-      {
-        $addToSet: { guardian: { $each: guardian } },
+    const updates = req.body.updates;
+
+    // Create bulk operations based on each user update
+    const bulkOperations = updates.map((update) => ({
+      updateOne: {
+        filter: { _id: update.id },
+        update: { $addToSet: { guardian: { $each: update.guardian } } },
       },
-      { new: true }
-    );
+    }));
 
-    console.log(guardian);
+    // Execute bulkWrite with the bulk operations
+    const result = await User.bulkWrite(bulkOperations);
 
-    if (!updatedUser) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
-    }
     res.status(200).json({
       status: "success",
-      message: "User updated successfully",
-      data: updatedUser,
+      data: result,
     });
   } catch (err) {
     res.status(500).json({

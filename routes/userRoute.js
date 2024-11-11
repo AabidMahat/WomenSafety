@@ -18,7 +18,7 @@ router.route("/verifyOtp").post(userController.verifyOtp);
 router.route("/resendOtp/:phoneNumber").get(userController.resendotp);
 
 router.route("/logIn").post(userController.logIn);
-router.route("/addGuardian/:userId").patch(userController.updateGuardian);
+router.route("/addGuardian").patch(userController.updateGuardian);
 
 router
   .route("/addAudioAndVideo/:userId")
