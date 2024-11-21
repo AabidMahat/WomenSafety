@@ -59,6 +59,32 @@ exports.getGuardiansWithNumber = async (req, res, next) => {
   }
 };
 
+exports.deleteRequest = async (req, res, next) => {
+  try {
+    const updates = req.body.updates;
+
+    const bulkOperations = updates.map((update) => ({
+      deleteOne: {
+        filter: {
+          _id: update._id,
+        },
+      },
+    }));
+
+    await Request.bulkWrite(bulkOperations);
+
+    res.status(200).json({
+      status: "success",
+      message: "Request Removed",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 exports.updateStatus = async (req, res, next) => {
   try {
     const updates = req.body.updates;
