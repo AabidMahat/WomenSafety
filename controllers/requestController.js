@@ -66,7 +66,7 @@ exports.deleteRequest = async (req, res, next) => {
     const bulkOperations = updates.map((update) => ({
       deleteOne: {
         filter: {
-          _id: update._id,
+          "guardians.phoneNumber": update.phoneNumber,
         },
       },
     }));
