@@ -27,4 +27,6 @@ router
 router
   .route("/gurdianWithPhoneNUmber")
   .post(userController.getGuardiansWithNumber);
+
+router.route("/allGuardianNumber").post(userController.getAllGuardianNumber);
 module.exports = router;
