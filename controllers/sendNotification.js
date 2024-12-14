@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const dotenv = require("dotenv");
+const { duration } = require("moment-timezone");
 dotenv.config({ path: "./config.env" });
 // Initialize the Firebase Admin SDK with the service account
 
@@ -97,20 +98,20 @@ exports.makeCall = async (req, res, next) => {
 
 exports.triggerRecording = async (req, res, next) => {
   try {
-    const { deviceToken, duration } = req.body;
+    const { fcm_token, duration, title, data } = req.body;
 
-    console.log({ deviceToken, duration });
+    console.log({ fcm_token, duration });
 
     const message = {
       notification: {
-        title: "Notification Recording",
-        body: "This is for recording audio recording purpose",
+        title: title,
+        body: data,
       },
       data: {
         duration: duration.toString(),
         action: "audioRecording",
       },
-      topic: "recording",
+      token: fcm_token,
     };
 
     admin
@@ -139,9 +140,9 @@ exports.triggerRecording = async (req, res, next) => {
 };
 exports.triggerVideoRecording = async (req, res, next) => {
   try {
-    const { deviceToken, duration, title, body } = req.body;
+    const { fcm_token, duration, title, body } = req.body;
 
-    console.log({ deviceToken, duration });
+    console.log({ fcm_token, duration });
 
     const message = {
       notification: {
@@ -152,7 +153,7 @@ exports.triggerVideoRecording = async (req, res, next) => {
         duration: duration.toString(),
         action: "startRecording",
       },
-      topic: "videoRecording",
+      token: fcm_token,
     };
 
     admin
