@@ -27,7 +27,7 @@ const communitySchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    image: {
+    profileImage: {
         type: String,
         default: "default.png",
     },
