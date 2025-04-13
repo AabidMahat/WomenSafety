@@ -41,3 +41,43 @@ exports.getCommunitiesByUser = async (req, res) => {
         });
     }
 };
+
+exports.getAllCommunitiesPaginated = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const page = parseInt(req.query.page) || 1;
+        const skip = (page - 1) * limit;
+
+        const communities = await Community.aggregate([
+        {
+            $addFields: {
+            memberCount: { $size: "$members" },
+            },
+        },
+        {
+            $sort: { memberCount: -1 },
+        },
+        {
+            $skip: skip,
+        },
+        {
+            $limit: limit,
+        },
+        ]);
+
+        const total = await Community.countDocuments();
+
+        res.status(200).json({
+        status: "success",
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalCommunities: total,
+        data: communities,
+        });
+    } catch (err) {
+        res.status(500).json({
+        status: "error",
+        message: err.message,
+        });
+    }
+};
