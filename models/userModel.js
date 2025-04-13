@@ -74,7 +74,7 @@ const userSchema = new mongoose.Schema({
   },
   videoUrl: [String],
   audioUrl: [String],
-  createdBy: {
+  communities: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Community",
           required: true,
