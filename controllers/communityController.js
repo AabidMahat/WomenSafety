@@ -81,3 +81,76 @@ exports.getAllCommunitiesPaginated = async (req, res) => {
         });
     }
 };
+
+exports.joinCommunity = async (req, res) => {
+try {
+        const { communityId, userId } = req.body;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+        return res.status(404).json({
+            status: "error",
+            message: "Community not found",
+        });
+        }
+
+        // Check if user is already a member
+        if (community.members.includes(userId)) {
+        return res.status(400).json({
+            status: "error",
+            message: "User already joined this community",
+        });
+        }
+
+        community.members.push(userId);
+        await community.save();
+
+        res.status(200).json({
+        status: "success",
+        message: "User successfully joined the community",
+        data: community,
+        });
+    } catch (err) {
+        res.status(500).json({
+        status: "error",
+        message: err.message,
+        });
+    }
+};
+
+exports.leaveCommunity = async (req, res) => {
+try {
+        const { communityId, userId } = req.body;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+        return res.status(404).json({
+            status: "error",
+            message: "Community not found",
+        });
+        }
+
+        if (!community.members.includes(userId)) {
+        return res.status(400).json({
+            status: "error",
+            message: "User is not a member of this community",
+        });
+        }
+
+        community.members = community.members.filter(memberId => memberId !== userId);
+        await community.save();
+
+        res.status(200).json({
+        status: "success",
+        message: "User has left the community",
+        data: community,
+        });
+    } catch (err) {
+        res.status(500).json({
+        status: "error",
+        message: err.message,
+        });
+    }
+};
