@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema({
           type: mongoose.Schema.Types.ObjectId,
           ref: "Community",
           required: true,
-          default:[],
+          default:[String],
   },
 });
 
