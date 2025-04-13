@@ -1,4 +1,5 @@
 const Community = require("../models/communityModel");
+const User = require("../models/userModel");
 
 exports.createCommunity = async (req, res) => {
     try {
