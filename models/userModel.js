@@ -74,12 +74,14 @@ const userSchema = new mongoose.Schema({
   },
   videoUrl: [String],
   audioUrl: [String],
-  communities: {
+  communities: [
+        {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Community",
           required: true,
-          default:[String],
-  },
+          default:[],
+        }
+      ],
 });
 
 const User = mongoose.model("User", userSchema);
