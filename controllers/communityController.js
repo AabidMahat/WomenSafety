@@ -103,7 +103,7 @@ try {
     });
     }
 
-    if (community.members.includes(userId) || user.communities.includes(communityId)) {
+    if (community.members.includes(userId) && user.communities.includes(communityId)) {
     return res.status(400).json({
         status: "error",
         message: "User already joined this community",
