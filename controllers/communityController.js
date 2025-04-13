@@ -87,7 +87,6 @@ try {
         const { communityId, userId } = req.body;
 
         const community = await Community.findById(communityId);
-
         if (!community) {
         return res.status(404).json({
             status: "error",
@@ -103,14 +102,28 @@ try {
         });
         }
 
+        // Add user to community members
         community.members.push(userId);
         await community.save();
+
+        // Add community to user's list
+        const user = await User.findById(userId);
+        if (user) {
+        if (!user.communities.includes(communityId)) {
+            user.communities.push(communityId);
+            await user.save();
+        }
+        }
 
         res.status(200).json({
         status: "success",
         message: "User successfully joined the community",
-        data: community,
+        data: {
+            community,
+            user,
+        },
         });
+
     } catch (err) {
         res.status(500).json({
         status: "error",
@@ -118,6 +131,7 @@ try {
         });
     }
 };
+  
 
 
 exports.leaveCommunity = async (req, res) => {
