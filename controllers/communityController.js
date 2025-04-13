@@ -119,12 +119,12 @@ try {
     }
 };
 
+
 exports.leaveCommunity = async (req, res) => {
 try {
         const { communityId, userId } = req.body;
 
         const community = await Community.findById(communityId);
-
         if (!community) {
         return res.status(404).json({
             status: "error",
@@ -139,14 +139,26 @@ try {
         });
         }
 
-        community.members = community.members.filter(memberId => memberId !== userId);
+        // Remove user from community
+        community.members = community.members.filter(memberId => memberId.toString() !== userId);
         await community.save();
+
+        // Remove community from user's list
+        const user = await User.findById(userId);
+        if (user) {
+        user.communities = user.communities.filter(cId => cId.toString() !== communityId);
+        await user.save();
+        }
 
         res.status(200).json({
         status: "success",
         message: "User has left the community",
-        data: community,
+        data: {
+            community,
+            user,
+        },
         });
+
     } catch (err) {
         res.status(500).json({
         status: "error",
@@ -154,3 +166,4 @@ try {
         });
     }
 };
+  
