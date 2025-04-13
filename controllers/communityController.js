@@ -84,53 +84,49 @@ exports.getAllCommunitiesPaginated = async (req, res) => {
 
 exports.joinCommunity = async (req, res) => {
 try {
-        const { communityId, userId } = req.body;
+    const { communityId, userId } = req.body;
 
-        const community = await Community.findById(communityId);
-        if (!community) {
-        return res.status(404).json({
-            status: "error",
-            message: "Community not found",
-        });
-        }
-
-        // Check if user is already a member
-        if (community.members.includes(userId)) {
-        return res.status(400).json({
-            status: "error",
-            message: "User already joined this community",
-        });
-        }
-
-        // Add user to community members
-        community.members.push(userId);
-        await community.save();
-
-        // Add community to user's list
-        const user = await User.findById(userId);
-        if (user) {
-        if (!user.communities.includes(communityId)) {
-            user.communities.push(communityId);
-            await user.save();
-        }
-        }
-
-        res.status(200).json({
-        status: "success",
-        message: "User successfully joined the community",
-        data: {
-            community,
-            user,
-        },
-        });
-
-    } catch (err) {
-        res.status(500).json({
+    const community = await Community.findById(communityId);
+    if (!community) {
+    return res.status(404).json({
         status: "error",
-        message: err.message,
-        });
+        message: "Community not found",
+    });
     }
+
+    const user = await User.findById(userId);
+    if (!user) {
+    return res.status(404).json({
+        status: "error",
+        message: "User not found",
+    });
+    }
+
+    if (community.members.includes(userId) || user.communities.includes(communityId)) {
+    return res.status(400).json({
+        status: "error",
+        message: "User already joined this community",
+    });
+    }
+
+    community.members.push(userId);
+    user.communities.push(communityId);
+
+    await Promise.all([community.save(), user.save()]);
+
+    res.status(200).json({
+    status: "success",
+    message: "User successfully joined the community",
+    data: { community, user },
+    });
+} catch (err) {
+    res.status(500).json({
+    status: "error",
+    message: err.message,
+    });
+}
 };
+  
   
 
 
