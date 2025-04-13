@@ -6,13 +6,13 @@ exports.createCommunity = async (req, res) => {
         const community = await Community.create({
         name,
         description,
-        createdBy: req.user._id,
+        createdBy: req.body.createdBy,
         createdAt: Date.now(),
-        members: [req.user._id],
+        members: [req.body.createdBy],
         profileImage: req.imageUrl || "default.png",
         });
 
-        res.status(201).json({
+        res.status(200).json({
         status: "success",
         data: community,
         });
