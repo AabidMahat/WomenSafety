@@ -136,6 +136,15 @@ try {
         const { communityId, userId } = req.body;
 
         const community = await Community.findById(communityId);
+        const user = await User.findById(userId);
+        
+        if (!user) {
+        return res.status(404).json({
+            status: "error",
+            message: "User not found",
+        });
+        }
+
         if (!community) {
         return res.status(404).json({
             status: "error",
@@ -150,12 +159,18 @@ try {
         });
         }
 
+        if (!user.communities.includes(communityId)) {
+        return res.status(400).json({
+            status: "error",
+            message: "User is not a member of this community",
+        });
+        }
+
         // Remove user from community
         community.members = community.members.filter(memberId => memberId.toString() !== userId);
         await community.save();
 
         // Remove community from user's list
-        const user = await User.findById(userId);
         if (user) {
         user.communities = user.communities.filter(cId => cId.toString() !== communityId);
         await user.save();
