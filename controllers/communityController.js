@@ -110,6 +110,7 @@ try {
     });
     }
 
+    community.memberCount++;
     community.members.push(userId);
     user.communities.push(communityId);
 
@@ -168,6 +169,7 @@ try {
 
         // Remove user from community
         community.members = community.members.filter(memberId => memberId.toString() !== userId);
+        community.memberCount--;
         await community.save();
 
         // Remove community from user's list
