@@ -12,6 +12,7 @@ exports.createCommunity = async (req, res) => {
             createdAt: Date.now(),
             members: [createdBy],
             profileImage: imageUrl,
+            memberCount: 1,
         });
 
         await User.findByIdAndUpdate(createdBy, {
