@@ -6,3 +6,5 @@ router = express.Router();
 
 router.route("/createPost").post(postController.createPost);
 router.route("/getCommunityPosts/:communityId").get(postController.getCommunityPosts);
+
+module.exports = router;
