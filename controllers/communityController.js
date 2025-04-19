@@ -3,24 +3,30 @@ const User = require("../models/userModel");
 
 exports.createCommunity = async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, createdBy } = req.body;
+
         const community = await Community.create({
-        name,
-        description,
-        createdBy: req.body.createdBy,
-        createdAt: Date.now(),
-        members: [req.body.createdBy],
-        profileImage: req.imageUrl || "default.png",
+            name,
+            description,
+            createdBy,
+            createdAt: Date.now(),
+            members: [createdBy],
+            profileImage: req.imageUrl || "default.png",
+        });
+
+        await User.findByIdAndUpdate(createdBy, {
+            $addToSet: { communities: community._id }
         });
 
         res.status(200).json({
-        status: "success",
-        data: community,
+            status: "success",
+            data: community,
         });
+
     } catch (err) {
         res.status(500).json({
-        status: "error",
-        message: err.message,
+            status: "error",
+            message: err.message,
         });
     }
 };
