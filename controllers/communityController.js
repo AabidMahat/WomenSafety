@@ -63,7 +63,7 @@ exports.getAllCommunitiesPaginated = async (req, res) => {
             },
         },
         {
-            $sort: { memberCount: -1 },
+            $sort: { memberCount: -1, _id:1 },
         },
         {
             $skip: skip,
