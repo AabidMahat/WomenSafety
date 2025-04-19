@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 
 exports.createCommunity = async (req, res) => {
     try {
-        const { name, description, createdBy } = req.body;
+        const { name, description, createdBy, imageUrl } = req.body;
 
         const community = await Community.create({
             name,
@@ -11,7 +11,7 @@ exports.createCommunity = async (req, res) => {
             createdBy,
             createdAt: Date.now(),
             members: [createdBy],
-            profileImage: req.imageUrl || "default.png",
+            profileImage: imageUrl,
         });
 
         await User.findByIdAndUpdate(createdBy, {
