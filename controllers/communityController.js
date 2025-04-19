@@ -85,110 +85,104 @@ exports.getAllCommunitiesPaginated = async (req, res) => {
 
 exports.joinCommunity = async (req, res) => {
 try {
-    const { communityId, userId } = req.body;
+    const {communityId, userId} = req.body;
 
-    const community = await Community.findById(communityId);
-    if (!community) {
-    return res.status(404).json({
-        status: "error",
-        message: "Community not found",
-    });
+    const communityExists = await Community.findOne({
+        _id: communityId,
+        members: {$ne: userId},
+    }).select('_id').lean(); 
+
+    if (!communityExists) {
+        return res.status(400).json({
+            status: "error",
+            message: "Community not found or user already joined",
+        });
     }
 
-    const user = await User.findById(userId);
-    if (!user) {
-    return res.status(404).json({
+    const userExists = await User.findOne({
+        _id: userId,
+        communities: { $ne: communityId },
+        }).select('_id').lean();
+
+        if (!userExists) {
+        return res.status(400).json({
+            status: "error",
+            message: "User not found or already in community",
+        });
+        }
+
+        await Promise.all([
+        Community.updateOne(
+            { _id: communityId },
+            { $addToSet: { members: userId }, $inc: { memberCount: 1 } }
+        ),
+        User.updateOne(
+            { _id: userId },
+            { $addToSet: { communities: communityId } }
+        )
+        ]);
+
+        return res.status(200).json({
+        status: "success",
+        message: "User successfully joined the community",
+        });
+    } catch (err) {
+        res.status(500).json({
         status: "error",
-        message: "User not found",
-    });
-    }
-
-    if (community.members.includes(userId) || user.communities.includes(communityId)) {
-    return res.status(400).json({
-        status: "error",
-        message: "User already joined this community",
-    });
-    }
-
-    community.memberCount++;
-    community.members.push(userId);
-    user.communities.push(communityId);
-
-    await Promise.all([community.save(), user.save()]);
-
-    res.status(200).json({
-    status: "success",
-    message: "User successfully joined the community",
-    data: { community, user },
-    });
-} catch (err) {
-    res.status(500).json({
-    status: "error",
-    message: err.message,
-    });
-}
+        message: err.message,
+        });
+        }
 };
-  
-  
-
 
 exports.leaveCommunity = async (req, res) => {
 try {
-        const { communityId, userId } = req.body;
+    const { communityId, userId } = req.body;
 
-        const community = await Community.findById(communityId);
-        const user = await User.findById(userId);
-        
-        if (!user) {
-        return res.status(404).json({
-            status: "error",
-            message: "User not found",
-        });
-        }
+    // Check if the user is a member of the community
+    const community = await Community.findOne({
+    _id: communityId,
+    members: userId,
+    }).select('_id').lean();
 
-        if (!community) {
-        return res.status(404).json({
-            status: "error",
-            message: "Community not found",
-        });
-        }
+    if (!community) {
+    return res.status(400).json({
+        status: "error",
+        message: "User is not a member of this community or community not found",
+    });
+    }
 
-        if (!community.members.includes(userId)) {
-        return res.status(400).json({
-            status: "error",
-            message: "User is not a member of this community",
-        });
-        }
+    // Check if the user has the community in their list
+    const user = await User.findOne({
+    _id: userId,
+    communities: communityId,
+    }).select('_id').lean();
 
-        if (!user.communities.includes(communityId)) {
-        return res.status(400).json({
-            status: "error",
-            message: "User is not a member of this community",
-        });
-        }
+    if (!user) {
+    return res.status(400).json({
+        status: "error",
+        message: "User not found or not a part of this community",
+    });
+    }
 
-        // Remove user from community
-        community.members = community.members.filter(memberId => memberId.toString() !== userId);
-        community.memberCount--;
-        await community.save();
+    // Perform both updates in parallel for atomicity
+    await Promise.all([
+    Community.updateOne(
+        { _id: communityId },
+        { $pull: { members: userId }, $inc: { memberCount: -1 } }
+    ),
+    User.updateOne(
+        { _id: userId },
+        { $pull: { communities: communityId } }
+    )
+    ]);
 
-        // Remove community from user's list
-        if (user) {
-        user.communities = user.communities.filter(cId => cId.toString() !== communityId);
-        await user.save();
-        }
-
-        res.status(200).json({
-        status: "success",
-        message: "User has left the community",
-        data: {
-            community,
-            user,
-        },
-        });
+    return res.status(200).json({
+    status: "success",
+    message: "User has left the community",
+    });
 
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
         status: "error",
         message: err.message,
         });
