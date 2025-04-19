@@ -31,6 +31,10 @@ const communitySchema = new mongoose.Schema({
         type: String,
         default: "default.png",
     },
+    memberCount: {
+        type: Number,
+        default: 1,
+    },
 });
 
 const Community = mongoose.model("Community", communitySchema);
