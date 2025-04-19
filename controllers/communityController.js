@@ -28,7 +28,7 @@ exports.createCommunity = async (req, res) => {
 exports.getCommunitiesByUser = async (req, res) => {
     try {
         const userId = req.params.id;
-
+        
         const communities = await Community.find({ members: userId });
 
         res.status(200).json({

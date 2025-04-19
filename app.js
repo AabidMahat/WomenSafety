@@ -7,6 +7,7 @@ const guardianRoute = require("./routes/guardianRoute");
 const tokenRoute = require("./routes/tokenRoute");
 const requestRoute = require("./routes/requestRouter");
 const communityRouter = require("./routes/communityRoute");
+const postRouter = require("./routes/postRoute");
 
 const app = express();
 
@@ -22,5 +23,6 @@ app.use("/api/v3/guardian", guardianRoute);
 app.use("/api/v3/token", tokenRoute);
 app.use("/api/v3/request", requestRoute);
 app.use("/api/v3/community", communityRouter);
+app.use("/api/v3/post", postRouter);
 
 module.exports = app;
