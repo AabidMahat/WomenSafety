@@ -54,3 +54,59 @@ try {
     });
 }
 };
+
+exports.addCommentToPost = async (req, res) => {
+try {
+    const { postId, comment, userId, userName, userImage } = req.body;
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ status: "error", message: "Post not found" });
+
+    const newComment = {
+    comment,
+    userId,
+    userName,
+    userImage: userImage || "default.png"
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    res.status(200).json({ status: "success", data: newComment });
+} catch (err) {
+    res.status(500).json({ status: "error", message: err.message });
+}
+};
+
+exports.getCommentsForPost = async (req, res) => {
+try {
+    const postId = req.params.postId;
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+
+    const skip = (page - 1) * limit;
+
+    const post = await Post.findById(postId)
+    .select({
+        comments: { $slice: [skip, limit] },
+    });
+
+    if (!post) {
+    return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+    });
+    }
+
+    res.status(200).json({
+    status: "success",
+    data: post.comments,
+    });
+} catch (err) {
+    res.status(500).json({
+    status: "error",
+    message: err.message,
+    });
+}
+};
+  
