@@ -78,7 +78,7 @@ try {
 }
 };
 
-exports.getCommentsForPost = async (req, res) => {
+exports.getPostComments = async (req, res) => {
 try {
     const postId = req.params.postId;
     const limit = parseInt(req.query.limit) || 10;
