@@ -28,9 +28,7 @@ admin.initializeApp({
 });
 
 exports.sendPushNotification = (req, res, next) => {
-  const { title, body, fcm_tokens } = req.body;
-
-  const uniqueTokens = [...new Set(fcm_tokens)];
+  const { title, body, fcm_token } = req.body;
 
   try {
     const message = {
@@ -38,7 +36,10 @@ exports.sendPushNotification = (req, res, next) => {
         title: title,
         body: body,
       },
-      tokens: uniqueTokens, // Use 'tokens' to send to multiple recipients
+      data: {
+        action: "emergency",
+      },
+      token: fcm_token, // Use 'tokens' to send to multiple recipients
     };
 
     admin
