@@ -39,12 +39,12 @@ exports.sendPushNotification = (req, res, next) => {
       data: {
         action: "emergency",
       },
-      token: fcm_token, // Use 'tokens' to send to multiple recipients
+      token: fcm_token,
     };
 
     admin
       .messaging()
-      .sendEachForMulticast(message) // sendMulticast expects 'tokens' field
+      .send(message)
       .then((response) => {
         console.log("Successfully sent message:", response);
         return res.status(200).send({
