@@ -396,10 +396,10 @@ exports.updateGuardian = async (req, res, next) => {
 exports.deleteGuardian = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const { guardianId, guardianNumber } = req.body;
+    const { guardianNumber } = req.body;
 
     // Validate input
-    if (!userId || !guardianId) {
+    if (!userId) {
       return res.status(400).json({
         status: "error",
         message: "User ID and Guardian ID are required",
@@ -409,7 +409,7 @@ exports.deleteGuardian = async (req, res, next) => {
     // Remove guardian from user's guardian array
     const userData = await User.findByIdAndUpdate(
       userId,
-      { $pull: { guardian: { _id: guardianId } } },
+      { $pull: { guardian: { phoneNumber: guardianNumber } } },
       { new: true }
     );
 
