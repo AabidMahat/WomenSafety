@@ -29,4 +29,6 @@ router
   .post(userController.getGuardiansWithNumber);
 
 router.route("/allGuardianNumber").post(userController.getAllGuardianNumber);
+
+router.route("/deleteGuardian/:userId").delete(userController.deleteGuardian);
 module.exports = router;
