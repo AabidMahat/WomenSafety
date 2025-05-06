@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const { Twilio } = require("twilio");
+const Guardian = require("../models/guardianModel");
 
 const accountSID = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
@@ -405,38 +406,38 @@ exports.deleteGuardian = async (req, res, next) => {
       });
     }
 
-    // Find the user by ID
-    const user = await User.findById(userId);
-    if (!user) {
+    // Remove guardian from user's guardian array
+    const userData = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { guardian: { _id: guardianId } } },
+      { new: true }
+    );
+
+    if (!userData) {
       return res.status(404).json({
         status: "error",
         message: "User not found",
       });
     }
 
-    // Check if the guardian exists in the user's guardian list
-    const guardianExists = user.guardian.some(
-      (guardian) => guardian._id.toString() === guardianId
+    // Remove userId from guardian's userId array
+    const guardianData = await Guardian.findByIdAndUpdate(
+      guardianId,
+      { $pull: { userId: userId } },
+      { new: true }
     );
-    if (!guardianExists) {
+
+    if (!guardianData) {
       return res.status(404).json({
         status: "error",
         message: "Guardian not found",
       });
     }
 
-    // Remove the guardian from the user's guardian array
-    user.guardian = user.guardian.filter(
-      (guardian) => guardian._id.toString() !== guardianId
-    );
-
-    // Save the updated user document
-    await user.save();
-
     res.status(200).json({
       status: "success",
       message: "Guardian deleted successfully",
-      data: user, // Optionally return updated user data
+      data: userData, // ✅ return the updated user
     });
   } catch (err) {
     res.status(500).json({
