@@ -19,31 +19,6 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
-
-  // @ Creating cookies with jwt token
-
-  const cookieOption = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-  };
-  res.cookie("jwt", token, cookieOption);
-
-  //   Return the response
-
-  res.status(statusCode).json({
-    status: statusCode,
-    message: "User logged In",
-    token,
-    data: {
-      user,
-    },
-  });
-};
-
 const sendOTp = async (phoneNumber, otp) => {
   const message = `Your verification code is ${otp}`;
 
@@ -232,6 +207,7 @@ exports.logIn = async (req, res, next) => {
       status: "success",
       message: "User logged In successfully",
       data: user,
+      jwtToken: signToken(user._id),
     });
   } catch (err) {
     return res.status(404).json({
