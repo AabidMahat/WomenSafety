@@ -9,8 +9,7 @@ const requestRoute = require("./routes/requestRouter");
 const communityRouter = require("./routes/communityRoute");
 const postRouter = require("./routes/postRoute");
 
-const authenticateToken = require("./middlewares/authMiddleware");
-
+const authenticateToken = require("./middlewares/authenticationMiddleware");
 
 const app = express();
 

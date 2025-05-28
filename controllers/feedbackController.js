@@ -1,22 +1,20 @@
 const Feedback = require("../models/feedbackModel");
-const FeedBack = require("../models/feedbackModel");
 const { notifyClientsNewFeedback } = require("../webSocket/feedback_websocket");
 
 exports.createFeedback = async (req, res, next) => {
   try {
-    const feedback = await FeedBack.create(req.body);
+    const userId = req.user.id;
+    const feedback = await Feedback.create({
+      ...req.body,
+      userId,
+    });
 
     if (!feedback) {
       return res.status(500).json({
         success: "Failed",
-        message: "Error while creating feedback ",
+        message: "Error while creating feedback",
       });
     }
-
-    // const populatedFeedback = await FeedBack.findById(feedback._id)
-    //   .populate("userId", "name role")
-    //   .populate("guardianId", "name role")
-    //   .exec();
 
     notifyClientsNewFeedback(feedback);
 
@@ -36,7 +34,7 @@ exports.updateFeedback = async (req, res, next) => {
   try {
     const { comment, category } = req.body;
 
-    const feedback = await FeedBack.findByIdAndUpdate(req.params.id, {
+    const feedback = await Feedback.findByIdAndUpdate(req.params.id, {
       comment,
       category,
     });
@@ -64,7 +62,7 @@ exports.updateFeedback = async (req, res, next) => {
 
 exports.getAllFeedback = async (req, res) => {
   try {
-    const feedbacks = await FeedBack.find()
+    const feedbacks = await Feedback.find()
       .populate("userId", "name role avatar")
       .populate("guardianId", "name role avatar")
       .exec();
@@ -89,7 +87,7 @@ exports.getAllFeedback = async (req, res) => {
 };
 
 exports.getAllFeedbackForWebSocket = async () => {
-  const feedbacks = await FeedBack.find()
+  const feedbacks = await Feedback.find()
     .populate("userId", "name role avatar")
     .populate("guardianId", "name role avatar")
     .exec();
@@ -101,10 +99,10 @@ exports.getAllFeedbackForWebSocket = async () => {
 };
 
 exports.checkFeedbackPresent = async (req, res, next) => {
-  const { location, userId } = req.body;
-  try {
-    console.log({ location, userId });
+  const { location } = req.body;
+  const userId = req.user.id;
 
+  try {
     const feedback = await Feedback.findOne({
       userId: userId,
       "location.latitude": location.latitude,
@@ -128,7 +126,7 @@ exports.checkFeedbackPresent = async (req, res, next) => {
   } catch (err) {
     return res.status(404).json({
       status: "error",
-      messgae: err.message,
+      message: err.message,
     });
   }
 };

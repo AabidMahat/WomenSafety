@@ -1,6 +1,6 @@
 const express = require("express");
 const userController = require("../controllers/userController");
-const authenticateToken = require("../middlewares/authMiddleware");
+const authenticateToken = require("../middlewares/authenticationMiddleware");
 
 const router = express.Router({ mergeParams: true });
 

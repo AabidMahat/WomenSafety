@@ -2,7 +2,8 @@ const Request = require("../models/requestModel");
 
 exports.addRequest = async (req, res, next) => {
   try {
-    const { guardianData, userId } = req.body;
+    const userId = req.user.id;
+    const { guardianData } = req.body;
 
     const bulkOperation = guardianData.map((guardian) => ({
       insertOne: {
@@ -41,12 +42,13 @@ exports.getGuardiansWithNumber = async (req, res, next) => {
       })
       .select("status userId");
 
-    if (!request) {
+    if (!request || request.length === 0) {
       return res.status(404).json({
         status: "error",
         message: "Request not found",
       });
     }
+
     res.status(200).json({
       status: "success",
       data: request,
@@ -87,16 +89,13 @@ exports.deleteRequest = async (req, res, next) => {
 
 exports.updateStatus = async (req, res, next) => {
   try {
-    const updates = req.body.updates;
+    const userId = req.user.id;
+    const { status } = req.body;
 
-    const bulkOperations = updates.map((update) => ({
-      updateOne: {
-        filter: { userId: update.userId },
-        update: { status: update.status },
-      },
-    }));
-
-    const result = await Request.bulkWrite(bulkOperations);
+    const result = await Request.updateMany(
+      { userId },
+      { $set: { status } }
+    );
 
     res.status(200).json({
       status: "success",
@@ -112,13 +111,13 @@ exports.updateStatus = async (req, res, next) => {
 
 exports.getRequestByUserId = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
 
     const request = await Request.find({
       userId,
     }).select("status guardians");
 
-    if (!request) {
+    if (!request || request.length === 0) {
       return res.status(404).json({
         status: "error",
         message: "Request not found",

@@ -1,15 +1,15 @@
-const { AggregateQuery } = require("firebase-admin/firestore");
 const Token = require("../models/tokenModel");
 const User = require("../models/userModel");
 
 exports.addOrUpdateFCMToken = async (req, res, next) => {
   try {
-    const { userId, fcm_token } = req.body;
+    const userId = req.user.id;
+    const { fcm_token } = req.body;
 
     const updatedToken = await Token.updateOne(
-      { userId: userId }, // Query to match document by userId
-      { $set: { fcm_token: fcm_token } }, // Fields to update
-      { upsert: true } // Upsert option: insert if not found
+      { userId },
+      { $set: { fcm_token } },
+      { upsert: true }
     );
 
     res.status(200).json({
@@ -28,13 +28,13 @@ exports.addOrUpdateFCMToken = async (req, res, next) => {
 
 exports.getAllToken = async (req, res, next) => {
   try {
+    const userId = req.body.userId;
+
     const tokens = await Token.find({
-      userId: {
-        $in: req.body.userId,
-      },
+      userId: { $in: userId },
     }).select("-__v");
 
-    if (!tokens) {
+    if (!tokens || tokens.length === 0) {
       return res.status(404).json({
         status: "error",
         message: "No tokens found",
@@ -56,12 +56,10 @@ exports.getAllToken = async (req, res, next) => {
 
 exports.getTokenOnPhoneNumber = async (req, res, next) => {
   try {
-    const phoneNumber = req.body.phoneNumber;
+    const { phoneNumber } = req.body;
 
     const result = await User.aggregate([
-      {
-        $match: { phoneNumber },
-      },
+      { $match: { phoneNumber } },
       {
         $lookup: {
           from: "tokens",
@@ -70,18 +68,14 @@ exports.getTokenOnPhoneNumber = async (req, res, next) => {
           as: "token",
         },
       },
-      {
-        $unwind: "$token",
-      },
-      {
-        $project: { "token.fcm_token": 1, _id: 0 },
-      },
+      { $unwind: "$token" },
+      { $project: { "token.fcm_token": 1, _id: 0 } },
     ]);
 
     if (result.length === 0) {
       return res.status(404).json({
         status: "error",
-        message: "No User or token found with this number",
+        message: "No user or token found with this number",
       });
     }
 

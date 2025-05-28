@@ -14,7 +14,7 @@ const authToken = process.env.TWILIO_TOKEN;
 const client = new Twilio(accountSID, authToken);
 
 const signToken = (id) => {
-  return jwt.sign({ id: id }, process.env.JWT_SECERT, {
+  return jwt.sign({ id:id }, process.env.JWT_SECERT, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -179,11 +179,13 @@ exports.logIn = async (req, res, next) => {
     if (!phoneNumber || !password) {
       return res.status(400).json({
         status: "error",
-        message: "Enter email or password",
+        message: "Enter phone number and password",
       });
     }
 
     const user = await User.findOne({ phoneNumber });
+
+    console.log(phoneNumber, password, user);
 
     if (!user) {
       return res.status(404).json({
