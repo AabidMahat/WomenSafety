@@ -71,6 +71,7 @@ exports.getAllFeedback = async (req, res) => {
       return res.status(200).json({
         success: "Failed",
         message: "No Feedback Found",
+        data:[]
       });
     }
 
