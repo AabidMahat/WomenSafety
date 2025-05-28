@@ -68,7 +68,7 @@ exports.getAllFeedback = async (req, res) => {
       .exec();
 
     if (!feedbacks || feedbacks.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: "Failed",
         message: "No Feedback Found",
       });
