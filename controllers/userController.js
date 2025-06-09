@@ -185,8 +185,6 @@ exports.logIn = async (req, res, next) => {
 
     const user = await User.findOne({ phoneNumber });
 
-    console.log(phoneNumber, password, user);
-
     if (!user) {
       return res.status(404).json({
         status: "error",
@@ -198,6 +196,13 @@ exports.logIn = async (req, res, next) => {
       return res.status(400).json({
         status: "error",
         message: "Phone Number is not verified\nPlease verify the number",
+      });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({
+        status: "error",
+        message: "Incorrect password",
       });
     }
 
